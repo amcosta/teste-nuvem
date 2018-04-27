@@ -1,17 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 namespace TiendaNube\Checkout\Service\Shipping;
 
 use Psr\Log\LoggerInterface;
 
-/**
- * Class AddressService
- *
- * @package TiendaNube\Checkout\Service\Shipping
- */
-class AddressService implements AddressServiceInterface
+class AddressServiceBeta implements AddressServiceInterface
 {
     /**
      * The database connection link
@@ -39,11 +32,22 @@ class AddressService implements AddressServiceInterface
      *
      * The expected return format is an array like:
      * [
+     *      "altitude" => 7.0,
+     *      "cep" => "40010000",
+     *      "latitude" => "-12.967192",
+     *      "longitude" => "-38.5101976",
      *      "address" => "Avenida da França",
      *      "neighborhood" => "Comércio",
-     *      "city" => "Salvador",
-     *      "state" => "BA"
+     *      "city" => [
+     *          "ddd" => 71,
+     *          "ibge" => "2927408",
+     *          "name" => "Salvador"
+     *      ],
+     *      "state" => [
+     *          "acronym" => "BA"
+     *      ]
      * ]
+     *
      * or false when not found.
      *
      * @param string $zip
