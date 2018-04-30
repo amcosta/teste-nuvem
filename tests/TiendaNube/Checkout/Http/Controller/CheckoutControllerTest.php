@@ -23,14 +23,26 @@ use TiendaNube\Checkout\Service\Shipping\AddressServiceBeta;
 
 class CheckoutControllerTest extends TestCase
 {
+    /**
+     * @var RequestStackInterface
+     */
+    private $requestStack;
+
+    /**
+     * @var ResponseBuilderInterface
+     */
+    private $responseBuilder;
+
+    public function setUp()
+    {
+        $this->requestStack = new Request(new ServerRequest());
+        $this->responseBuilder = new ResponseBuilder(new Response(), new Stream());
+    }
 
     public function testGetAddressValidToNotBetaTester()
     {
-        $requestStack = new Request(new ServerRequest());
-        $responseBuilder = new ResponseBuilder(new Response(), new Stream());
-
         // getting controller instance
-        $controller = $this->getControllerInstance($requestStack, $responseBuilder);
+        $controller = $this->getControllerInstance($this->requestStack, $this->responseBuilder);
 
         // expected address
         $address = [
@@ -58,6 +70,9 @@ class CheckoutControllerTest extends TestCase
 
     public function testGetAddressValidToBetaTester()
     {
+        // getting controller instance
+        $controller = $this->getControllerInstance($this->requestStack, $this->responseBuilder);
+
         // expected address
         $address = [
             "altitude" => 7.0,
@@ -75,12 +90,6 @@ class CheckoutControllerTest extends TestCase
                 "acronym" => "BA"
             ]
         ];
-
-        $requestStack = new Request(new ServerRequest());
-        $responseBuilder = new ResponseBuilder(new Response(), new Stream());
-
-        // getting controller instance
-        $controller = $this->getControllerInstance($requestStack, $responseBuilder);
 
         // mocking the address service
         $addressService = $this->createMock(AddressServiceBeta::class);
@@ -101,7 +110,7 @@ class CheckoutControllerTest extends TestCase
     public function testGetAddressInvalidToNotBetaTester()
     {
         // getting controller instance
-        $controller = $this->getControllerInstance();
+        $controller = $this->getControllerInstance($this->requestStack, $this->responseBuilder);
 
         // mocking address service
         $addressService = $this->createMock(AddressService::class);
@@ -112,13 +121,14 @@ class CheckoutControllerTest extends TestCase
 
         // asserts
         $this->assertEquals(404, $result->getStatusCode());
+        $this->assertEquals('application/json', $result->getHeaderLine('Content-Type'));
         $this->assertEquals('{"error":"The requested zipcode was not found."}', $result->getBody()->getContents());
     }
 
     public function testGetAddressInvalidToBetaTester()
     {
         // getting controller instance
-        $controller = $this->getControllerInstance();
+        $controller = $this->getControllerInstance($this->requestStack, $this->responseBuilder);
 
         // mocking address service
         $addressService = $this->createMock(AddressServiceBeta::class);
