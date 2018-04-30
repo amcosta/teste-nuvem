@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TiendaNube\Checkout\Http\Controller;
 
 use Psr\Http\Message\ResponseInterface;
+use TiendaNube\Checkout\Service\Helper\ZipcodeHelper;
 use TiendaNube\Checkout\Service\Shipping\AddressServiceInterface;
 
 class CheckoutController extends AbstractController
@@ -29,7 +30,7 @@ class CheckoutController extends AbstractController
     public function getAddressAction(string $zipcode, AddressServiceInterface $addressService): ResponseInterface
     {
         // filtering and sanitizing input
-        $rawZipcode = preg_replace("/[^\d]/","",$zipcode);
+        $rawZipcode = ZipcodeHelper::sanitize($zipcode);
 
         // getting address by zipcode
         $address = $addressService->getAddressByZip($rawZipcode);
