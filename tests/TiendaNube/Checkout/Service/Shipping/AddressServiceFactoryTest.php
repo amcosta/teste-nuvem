@@ -9,7 +9,7 @@ use TiendaNube\Checkout\Service\Store\StoreServiceInterface;
 
 class AddressServiceFactoryTest extends TestCase
 {
-    public function testCreateAddressServiceToNotBetaTester()
+    public function testCreateNotBetaTesterAddressService()
     {
         $store = new Store();
         $store->disableBetaTesting();
@@ -25,7 +25,7 @@ class AddressServiceFactoryTest extends TestCase
         $this->assertInstanceOf(AddressService::class, $service);
     }
 
-    public function testCreateAddressServiceForBetaTester()
+    public function testCreateABetaTesterAddressService()
     {
         $store = new Store();
         $store->enableBetaTesting();
