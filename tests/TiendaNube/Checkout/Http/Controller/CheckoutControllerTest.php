@@ -11,9 +11,15 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
+use TiendaNube\Checkout\Http\Request\HttpRequest;
 use TiendaNube\Checkout\Http\Request\RequestStackInterface;
+use TiendaNube\Checkout\Http\Request\ServerRequest;
+use TiendaNube\Checkout\Http\Response\JsonBuilderResponse;
+use TiendaNube\Checkout\Http\Response\Response;
 use TiendaNube\Checkout\Http\Response\ResponseBuilderInterface;
-use TiendaNube\Checkout\Service\Shipping\AddressServiceInterface;
+use TiendaNube\Checkout\Http\Response\Stream;
+use TiendaNube\Checkout\Service\Shipping\AddressService;
+use TiendaNube\Checkout\Service\Shipping\AddressServiceBeta;
 
 class CheckoutControllerTest extends TestCase
 {
@@ -32,24 +38,87 @@ class CheckoutControllerTest extends TestCase
         ];
 
         // mocking the address service
-        $addressService = $this->createMock(AddressServiceInterface::class);
+        $addressService = $this->createMock(AddressService::class);
+        $addressService->method('getAddressByZip')->willReturn($address);
+
+        // test
+        $result = $controller->getAddressAction('40010000', $addressService);
+
+        // asserts
+        $content = json_encode($address);
+
+        $this->assertEquals($content, $result->getBody()->getContents());
+        $this->assertEquals(200, $result->getStatusCode());
+//        $this->assertEquals('application/json', $result->getHeader('Content-Type'));
+//        $this->assertEquals(strlen($content), $result->getHeader('Content-Length'));
+    }
+
+    public function testGetAddressValidToBetaTester()
+    {
+        // expected address
+        $address = [
+            "altitude" => 7.0,
+            "cep" => "40010000",
+            "latitude" => "-12.967192",
+            "longitude" => "-38.5101976",
+            "address" => "Avenida da França",
+            "neighborhood" => "Comércio",
+            "city" => [
+                "ddd" => 71,
+                "ibge" => "2927408",
+                "name" => "Salvador"
+            ],
+            "state" => [
+                "acronym" => "BA"
+            ]
+        ];
+
+        $requestStack = new HttpRequest(new ServerRequest());
+        $responseBuilder = new JsonBuilderResponse(new Response(), new Stream());
+
+        // getting controller instance
+        $controller = $this->getControllerInstance($requestStack, $responseBuilder);
+
+        // mocking the address service
+        $addressService = $this->createMock(AddressServiceBeta::class);
         $addressService->method('getAddressByZip')->willReturn($address);
 
         // test
         $result = $controller->getAddressAction('40010000',$addressService);
 
         // asserts
-        $this->assertEquals(json_encode($address),$result->getBody()->getContents());
-        $this->assertEquals(200,$result->getStatusCode());
+        $content = json_encode($address);
+
+        $this->assertEquals($content, $result->getBody()->getContents());
+        $this->assertEquals(200, $result->getStatusCode());
+//        $this->assertEquals('application/json', $result->getHeader('Content-Type'));
+//        $this->assertEquals(strlen($content), $result->getHeader('Content-Length'));
     }
 
-    public function testGetAddressInvalid()
+    public function testGetAddressInvalidToNotBetaTester()
     {
         // getting controller instance
         $controller = $this->getControllerInstance();
 
         // mocking address service
-        $addressService = $this->createMock(AddressServiceInterface::class);
+        $addressService = $this->createMock(AddressService::class);
+        $addressService->method('getAddressByZip')->willReturn(null);
+
+        // test
+        $result = $controller->getAddressAction('400100001', $addressService);
+
+        // asserts
+        $this->assertEquals(404, $result->getStatusCode());
+        $this->assertEquals('{"error":"The requested zipcode was not found."}', $result->getBody()->getContents());
+    }
+
+    public function testGetAddressInvalidToBetaTester()
+    {
+        // getting controller instance
+        $controller = $this->getControllerInstance();
+
+        // mocking address service
+        $addressService = $this->createMock(AddressServiceBeta::class);
         $addressService->method('getAddressByZip')->willReturn(null);
 
         // test
