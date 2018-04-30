@@ -11,10 +11,10 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
-use TiendaNube\Checkout\Http\Request\HttpRequest;
+use TiendaNube\Checkout\Http\Request\Request;
 use TiendaNube\Checkout\Http\Request\RequestStackInterface;
 use TiendaNube\Checkout\Http\Request\ServerRequest;
-use TiendaNube\Checkout\Http\Response\JsonBuilderResponse;
+use TiendaNube\Checkout\Http\Response\ResponseBuilder;
 use TiendaNube\Checkout\Http\Response\Response;
 use TiendaNube\Checkout\Http\Response\ResponseBuilderInterface;
 use TiendaNube\Checkout\Http\Response\Stream;
@@ -26,8 +26,11 @@ class CheckoutControllerTest extends TestCase
 
     public function testGetAddressValidToNotBetaTester()
     {
+        $requestStack = new Request(new ServerRequest());
+        $responseBuilder = new ResponseBuilder(new Response(), new Stream());
+
         // getting controller instance
-        $controller = $this->getControllerInstance();
+        $controller = $this->getControllerInstance($requestStack, $responseBuilder);
 
         // expected address
         $address = [
@@ -49,8 +52,8 @@ class CheckoutControllerTest extends TestCase
 
         $this->assertEquals($content, $result->getBody()->getContents());
         $this->assertEquals(200, $result->getStatusCode());
-//        $this->assertEquals('application/json', $result->getHeader('Content-Type'));
-//        $this->assertEquals(strlen($content), $result->getHeader('Content-Length'));
+        $this->assertEquals('application/json', $result->getHeaderLine('Content-Type'));
+        $this->assertEquals(strlen($content), $result->getHeaderLine('Content-Length'));
     }
 
     public function testGetAddressValidToBetaTester()
@@ -73,8 +76,8 @@ class CheckoutControllerTest extends TestCase
             ]
         ];
 
-        $requestStack = new HttpRequest(new ServerRequest());
-        $responseBuilder = new JsonBuilderResponse(new Response(), new Stream());
+        $requestStack = new Request(new ServerRequest());
+        $responseBuilder = new ResponseBuilder(new Response(), new Stream());
 
         // getting controller instance
         $controller = $this->getControllerInstance($requestStack, $responseBuilder);
@@ -91,8 +94,8 @@ class CheckoutControllerTest extends TestCase
 
         $this->assertEquals($content, $result->getBody()->getContents());
         $this->assertEquals(200, $result->getStatusCode());
-//        $this->assertEquals('application/json', $result->getHeader('Content-Type'));
-//        $this->assertEquals(strlen($content), $result->getHeader('Content-Length'));
+        $this->assertEquals('application/json', $result->getHeaderLine('Content-Type'));
+        $this->assertEquals(strlen($content), $result->getHeaderLine('Content-Length'));
     }
 
     public function testGetAddressInvalidToNotBetaTester()
