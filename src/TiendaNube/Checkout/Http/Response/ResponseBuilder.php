@@ -5,7 +5,7 @@ namespace TiendaNube\Checkout\Http\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class JsonBuilderResponse implements ResponseBuilderInterface
+class ResponseBuilder implements ResponseBuilderInterface
 {
     /**
      * @var ResponseInterface
@@ -23,19 +23,23 @@ class JsonBuilderResponse implements ResponseBuilderInterface
         $this->stream = $stream;
     }
 
+    /**
+     * Factory a Response object
+     *
+     * @param mixed $body
+     * @param int $status
+     * @param array $headers
+     * @return ResponseInterface
+     */
     public function buildResponse($body, int $status = 200, array $headers = []): ResponseInterface
     {
-        $response = $this->response;
-
-        $body = is_array($body) ? json_encode($body) : $body;
         $this->stream->write($body);
+
+        $response = $this->response;
 
         foreach ($headers as $header => $value) {
             $response->withHeader($header, $value);
         }
-
-        $response->withHeader('Content-Type', 'application/json');
-        $response->withHeader('Content-Length', $this->stream->getSize());
 
         $response->withBody($this->stream);
         $response->withStatus($status);

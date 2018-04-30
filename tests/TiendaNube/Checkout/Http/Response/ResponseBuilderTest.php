@@ -5,9 +5,8 @@ namespace TiendaNube\Checkout\Http\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use TiendaNube\Checkout\Http\Response\JsonBuilderResponse;
 
-class JsonBuilderResponseTest extends TestCase
+class ResponseBuilderTest extends TestCase
 {
     public function testGetSuccessResponse()
     {
@@ -28,7 +27,7 @@ class JsonBuilderResponseTest extends TestCase
         $mockResponse->method('getHeaderLine')->with('Content-Type')->willReturn('application/json');
         $mockResponse->method('getBody')->willReturn($mockStream);
 
-        $jsonBuilderResponse = new JsonBuilderResponse($mockResponse, $mockStream);
+        $jsonBuilderResponse = new ResponseBuilder($mockResponse, $mockStream);
         $response = $jsonBuilderResponse->buildResponse($body, $status, $headers);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
