@@ -27,15 +27,16 @@ class JsonBuilderResponse implements ResponseBuilderInterface
     {
         $response = $this->response;
 
-        $body = is_array($body) ?: json_encode($body);
+        $body = is_array($body) ? json_encode($body) : $body;
         $this->stream->write($body);
 
         foreach ($headers as $header => $value) {
             $response->withHeader($header, $value);
         }
 
-        $response->withAddedHeader('Content-Type', 'application/json');
+        $response->withHeader('Content-Type', 'application/json');
         $response->withHeader('Content-Length', $this->stream->getSize());
+
         $response->withBody($this->stream);
         $response->withStatus($status);
 
