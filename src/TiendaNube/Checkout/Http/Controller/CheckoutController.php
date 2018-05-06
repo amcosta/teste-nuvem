@@ -24,11 +24,13 @@ class CheckoutController extends AbstractController
      * @Route /address/{zipcode}
      *
      * @param string $zipcode
-     * @param AddressServiceInterface $addressService
      * @return ResponseInterface
      */
-    public function getAddressAction(string $zipcode, AddressServiceInterface $addressService): ResponseInterface
+    public function getAddressAction(string $zipcode): ResponseInterface
     {
+        /* @var AddressServiceInterface $addressService */
+        $addressService = $this->getContainer()->get('shipping.addressService');
+
         // filtering and sanitizing input
         $rawZipcode = ZipcodeHelper::sanitize($zipcode);
 
