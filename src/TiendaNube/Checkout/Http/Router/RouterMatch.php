@@ -15,7 +15,11 @@ class RouterMatch
     public function verify(string $uri, string $route, array $regex = []): bool
     {
         $pattern = $this->mountPattern($route, $regex);
-        return preg_match($pattern, $uri, $this->params);
+        $result = preg_match($pattern, $uri, $this->params);
+
+        array_shift($this->params);
+
+        return $result;
     }
 
     public function getParams()
@@ -50,7 +54,7 @@ class RouterMatch
                 continue;
             }
 
-            $pattern[] = '(' . $term . ')';
+            $pattern[] = $term;
         }
 
         return '/^\/' . implode('\/', $pattern) . '$/';

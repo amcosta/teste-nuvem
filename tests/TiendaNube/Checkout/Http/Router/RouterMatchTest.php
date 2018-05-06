@@ -14,27 +14,25 @@ class RouterMatchTest extends TestCase
 
         $routerMatch = new RouterMatch();
         $actual = $routerMatch->verify($uri, $route, $regex);
+        $params = $routerMatch->getParams();
 
         $this->assertTrue($actual);
-        $this->assertTrue(is_array($routerMatch->getParams()));
+        $this->assertTrue(is_array($params));
+        $this->assertCount(1, $params);
+        $this->assertEquals('40010000', $params[0]);
 
-        $params = $routerMatch->getParams();
-        $this->assertCount(3, $params);
-        $this->assertEquals('/address/40010000', $params[0]);
-        $this->assertEquals('address', $params[1]);
-        $this->assertEquals('40010000', $params[2]);
+        $uri = '/resource/1';
+        $route = '/{resource}/{id}';
+        $regex = ['id' => '\d+'];
 
-        $regex = ['zipcode' => '\d{8}'];
         $actual = $routerMatch->verify($uri, $route, $regex);
+        $params = $routerMatch->getParams();
 
         $this->assertTrue($actual);
-        $this->assertTrue(is_array($routerMatch->getParams()));
-
-        $params = $routerMatch->getParams();
-        $this->assertCount(3, $params);
-        $this->assertEquals('/address/40010000', $params[0]);
-        $this->assertEquals('address', $params[1]);
-        $this->assertEquals('40010000', $params[2]);
+        $this->assertTrue(is_array($params));
+        $this->assertCount(2, $params);
+        $this->assertEquals('resource', $params[0]);
+        $this->assertEquals('1', $params[1]);
     }
 
     public function testVerifyInvalidRoute()
@@ -57,13 +55,13 @@ class RouterMatchTest extends TestCase
         $routerMatch = new RouterMatch();
         $pattern = $routerMatch->mountPattern($route, $regex);
 
-        $this->assertEquals('/^\/(address)\/(\d+)$/', $pattern);
+        $this->assertEquals('/^\/address\/(\d+)$/', $pattern);
 
         $route = '/address/{zipcode}';
         $regex = ['zipcode' => '\d{8}'];
 
         $pattern = $routerMatch->mountPattern($route, $regex);
 
-        $this->assertEquals('/^\/(address)\/(\d{8})$/', $pattern);
+        $this->assertEquals('/^\/address\/(\d{8})$/', $pattern);
     }
 }
