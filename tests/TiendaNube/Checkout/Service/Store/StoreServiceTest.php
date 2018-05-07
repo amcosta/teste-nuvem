@@ -67,7 +67,7 @@ class StoreServiceTest extends TestCase
     private function mockRequest($headerAuthorizationBearerValue = null)
     {
         $request = $this->createMock(RequestInterface::class);
-        $request->method('getHeaderLine')->with('Authorization-Bearer')->willReturn($headerAuthorizationBearerValue);
+        $request->method('getHeaderLine')->with('Authentication-Bearer')->willReturn($headerAuthorizationBearerValue);
 
         return $request;
     }

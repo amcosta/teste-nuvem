@@ -31,7 +31,7 @@ class StoreService implements StoreServiceInterface
      */
     public function getCurrentStore(): Store
     {
-        $token = $this->request->getHeaderLine('Authorization-Bearer');
+        $token = $this->request->getHeaderLine('Authentication-Bearer');
 
         // @TODO build logic to retrieve store from database and delete the code bellow
         if ('YouShallPass' === $token) {
