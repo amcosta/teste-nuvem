@@ -141,7 +141,7 @@ class Application
         try {
             $this->container->get('store.storeService')->getCurrentStore();
         } catch (\InvalidArgumentException $e) {
-            $response = $this->responseBuilder->buildResponse(null, 403, ['Content-Type' => 'application/json']);
+            $response = $this->responseBuilder->buildResponse(null, 401, ['Content-Type' => 'application/json']);
             $this->renderResponse($response);
             return false;
         }
