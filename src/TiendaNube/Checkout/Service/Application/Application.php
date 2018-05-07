@@ -76,6 +76,21 @@ class Application
         $this->router = new Router($routerMatch, $this->requestStack, $this->responseBuilder, $this->container);
     }
 
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    public function getRequestStack()
+    {
+        return $this->requestStack;
+    }
+
+    public function getResponseBuilder()
+    {
+        return $this->responseBuilder;
+    }
+
     public function get(string $route, string $controller, array $regex = [])
     {
         $this->router->addRoute('GET', $route, $controller, $regex);
@@ -90,8 +105,6 @@ class Application
         try {
             $response = $this->router->run();
         } catch (\Exception $e) {
-            print_r($e);
-            die();
             $this->logger->error($e->getMessage());
             $response = $this->responseBuilder->buildResponse(null, 500, ['Content-Type' => 'application/json']);
             $this->renderResponse($response);
@@ -117,6 +130,7 @@ class Application
         try {
             $this->container->set($id, $value);
         } catch (ContainerException $e) {
+            $this->logger->error($e->getMessage());
             $response = $this->responseBuilder->buildResponse(null, 500, ['Content-Type' => 'application/json']);
             $this->renderResponse($response);
         }
