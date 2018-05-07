@@ -25,9 +25,26 @@ services:
             - ".:/var/www/html"
         ports:
             - "9000:9000"
+        depends_on:
+            - mysqldb
         networks:
             - nuvem_backend
 
+    mysqldb:
+        image: mysql
+        container_name: nuvem_mysql
+        restart: always
+        environment:
+            - MYSQL_DATABASE=nuvem_shop
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_USER=nuvem
+            - MYSQL_PASSWORD=nuvem
+        ports:
+            - "8989:3306"
+        volumes:
+            - "./docker/data/db/mysql:/var/lib/mysql"
+        networks:
+            - nuvem_backend
 networks:
     nuvem_backend:
         driver: bridge
