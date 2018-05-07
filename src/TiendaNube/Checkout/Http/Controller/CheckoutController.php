@@ -6,6 +6,7 @@ namespace TiendaNube\Checkout\Http\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use TiendaNube\Checkout\Service\Helper\ZipcodeHelper;
+use TiendaNube\Checkout\Service\Shipping\AddressServiceFactory;
 use TiendaNube\Checkout\Service\Shipping\AddressServiceInterface;
 
 class CheckoutController extends AbstractController
@@ -28,8 +29,11 @@ class CheckoutController extends AbstractController
      */
     public function getAddressAction(string $zipcode): ResponseInterface
     {
+        /* @var AddressServiceFactory $addressServiceFactory */
+        $addressServiceFactory = $this->getContainer()->get('shipping.addressServiceFactory');
+
         /* @var AddressServiceInterface $addressService */
-        $addressService = $this->getContainer()->get('shipping.addressService');
+        $addressService = $addressServiceFactory->create();
 
         // filtering and sanitizing input
         $rawZipcode = ZipcodeHelper::sanitize($zipcode);

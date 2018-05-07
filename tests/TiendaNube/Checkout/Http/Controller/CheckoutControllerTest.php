@@ -20,6 +20,7 @@ use TiendaNube\Checkout\Http\Response\ResponseBuilderInterface;
 use TiendaNube\Checkout\Http\Response\Stream;
 use TiendaNube\Checkout\Service\Shipping\AddressService;
 use TiendaNube\Checkout\Service\Shipping\AddressServiceBeta;
+use TiendaNube\Checkout\Service\Shipping\AddressServiceFactory;
 use TiendaNube\Checkout\Service\Shipping\AddressServiceInterface;
 
 class CheckoutControllerTest extends TestCase
@@ -54,8 +55,11 @@ class CheckoutControllerTest extends TestCase
         $addressService = $this->createMock(AddressService::class);
         $addressService->method('getAddressByZip')->willReturn($address);
 
+        $addressServiceFactory = $this->createMock(AddressServiceFactory::class);
+        $addressServiceFactory->method('create')->willReturn($addressService);
+
         // getting controller instance
-        $controller = $this->getControllerInstance($this->requestStack, $this->responseBuilder, $addressService);
+        $controller = $this->getControllerInstance($this->requestStack, $this->responseBuilder, $addressServiceFactory);
 
         // test
         $result = $controller->getAddressAction('40010000');
@@ -93,8 +97,11 @@ class CheckoutControllerTest extends TestCase
         $addressService = $this->createMock(AddressServiceBeta::class);
         $addressService->method('getAddressByZip')->willReturn($address);
 
+        $addressServiceFactory = $this->createMock(AddressServiceFactory::class);
+        $addressServiceFactory->method('create')->willReturn($addressService);
+
         // getting controller instance
-        $controller = $this->getControllerInstance($this->requestStack, $this->responseBuilder, $addressService);
+        $controller = $this->getControllerInstance($this->requestStack, $this->responseBuilder, $addressServiceFactory);
 
         // test
         $result = $controller->getAddressAction('40010000',$addressService);
@@ -114,8 +121,11 @@ class CheckoutControllerTest extends TestCase
         $addressService = $this->createMock(AddressService::class);
         $addressService->method('getAddressByZip')->willReturn(null);
 
+        $addressServiceFactory = $this->createMock(AddressServiceFactory::class);
+        $addressServiceFactory->method('create')->willReturn($addressService);
+
         // getting controller instance
-        $controller = $this->getControllerInstance($this->requestStack, $this->responseBuilder, $addressService);
+        $controller = $this->getControllerInstance($this->requestStack, $this->responseBuilder, $addressServiceFactory);
 
         // test
         $result = $controller->getAddressAction('400100001', $addressService);
@@ -132,8 +142,11 @@ class CheckoutControllerTest extends TestCase
         $addressService = $this->createMock(AddressServiceBeta::class);
         $addressService->method('getAddressByZip')->willReturn(null);
 
+        $addressServiceFactory = $this->createMock(AddressServiceFactory::class);
+        $addressServiceFactory->method('create')->willReturn($addressService);
+
         // getting controller instance
-        $controller = $this->getControllerInstance($this->requestStack, $this->responseBuilder, $addressService);
+        $controller = $this->getControllerInstance($this->requestStack, $this->responseBuilder, $addressServiceFactory);
 
         // test
         $result = $controller->getAddressAction('400100001',$addressService);
@@ -200,19 +213,19 @@ class CheckoutControllerTest extends TestCase
      *
      * @param null|RequestStackInterface $requestStack
      * @param null|ResponseBuilderInterface $responseBuilder
-     * @param AddressServiceInterface $addressService
+     * @param AddressServiceFactory $addressServiceFactory
      * @return CheckoutController
      */
     private function getControllerInstance(
         ?RequestStackInterface $requestStack = null,
         ?ResponseBuilderInterface $responseBuilder = null,
-        AddressServiceInterface $addressService = null
+        AddressServiceFactory $addressServiceFactory
     ) {
         // mocking units
         $requestStack = $requestStack ?: $this->getRequestStackInstance();
         $responseBuilder = $responseBuilder ?: $this->getResponseBuilderInstance();
         $container = $this->createMock(ContainerInterface::class);
-        $container->method('get')->with($this->equalTo('shipping.addressService'))->willReturn($addressService);
+        $container->method('get')->with($this->equalTo('shipping.addressServiceFactory'))->willReturn($addressServiceFactory);
 
         return new CheckoutController($container,$requestStack,$responseBuilder);
     }
