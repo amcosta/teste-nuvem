@@ -35,7 +35,24 @@ class StoreService implements StoreServiceInterface
 
         // @TODO build logic to retrieve store from database and delete the code bellow
         if ('YouShallPass' === $token) {
-            return new Store();
+            $store = new Store();
+            $store->enableBetaTesting();
+
+            return $store;
+        }
+
+        if ('BetaTester' === $token) {
+            $store = new Store();
+            $store->enableBetaTesting();
+
+            return $store;
+        }
+
+        if ('NotBetaTester' === $token) {
+            $store = new Store();
+            $store->disableBetaTesting();
+
+            return $store;
         }
 
         $message = sprintf('No store was found by token: "%s"', $token);

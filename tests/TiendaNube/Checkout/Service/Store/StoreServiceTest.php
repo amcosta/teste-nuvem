@@ -15,14 +15,30 @@ class StoreServiceTest extends TestCase
         $this->assertInstanceOf(StoreServiceInterface::class, $service);
     }
 
-    public function testRetriveStoreFromService()
+    /**
+     * @dataProvider providerForTestRetriveStoreFromService
+     * @param $token
+     * @param $isBetaTester
+     */
+    public function testRetriveStoreFromService($token, $isBetaTester)
     {
         $logger = $this->mockLogger();
-        $request = $this->mockRequest('YouShallPass');
+        $request = $this->mockRequest($token);
 
         $service = new StoreService($request, $logger);
+        $store = $service->getCurrentStore();
 
-        $this->assertInstanceOf(Store::class, $service->getCurrentStore());
+        $this->assertInstanceOf(Store::class, $store);
+        $this->assertEquals($isBetaTester, $store->isBetaTester());
+    }
+
+    public function providerForTestRetriveStoreFromService()
+    {
+        return [
+            ['YouShallPass', true],
+            ['BetaTester', true],
+            ['NotBetaTester', false]
+        ];
     }
 
     /**
